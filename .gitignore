@@ -1,4 +1,4 @@
-# Dependencies
+# Dep/endencies
 node_modules/
 
 # Environment variables
@@ -32,26 +32,21 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Redis data (if running locally)
+# Redis data (local)
 dump.rdb
 appendonly.aof
 
-# Database files (local development)
+# Database files
 *.db
 *.sqlite
 *.sqlite3
 
 # Prisma generated files
 prisma/dev.db
+src/generated/prisma/
 
 # Test artifacts
 test-results/
 
 # npm cache
-.npm/node_modules
-# Keep environment variables out of version control
-.env
-
-/src/generated/prisma
-
-.env
+.npm/
