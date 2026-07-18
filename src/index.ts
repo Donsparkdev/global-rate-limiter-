@@ -1,6 +1,8 @@
 import express from "express";
 import redisClient from "./config/redis";
 import { rateLimiter } from "./middleware/rateLimiter";
+import metricsRouter from "./routes/metrics";
+import logger from "./logger";
 
 const app = express();
 
@@ -9,13 +11,16 @@ const PORT = process.env.PORT || 3000;
 // Global middleware first
 app.use(express.json());
 
+// metrics
+app.use("/metrics", metricsRouter);
+
 // Connect Redis
 redisClient.connect()
   .then(() => {
-    console.log("✅ Redis connected");
+    logger.info(`🚀 Server running on port ${PORT}`);
   })
   .catch((error) => {
-    console.error("Redis connection failed:", error);
+    logger.error("Redis connection failed:", error);
   });
 
 
