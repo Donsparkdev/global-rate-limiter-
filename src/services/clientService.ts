@@ -8,7 +8,7 @@ const clients: Client[] = [
   {
     id: "clientA",
     apiKey: "clientA-key",
-    requestsPerMinute: 100,
+    requestsPerMinute: 5,
   },
   {
     id: "clientB",

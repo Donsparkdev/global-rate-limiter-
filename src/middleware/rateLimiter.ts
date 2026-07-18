@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { checkRateLimit } from "../services/limiter/rateLimiter";
 import { getClient } from "../services/clientService";
-
+import { checkSlidingWindow } from "../services/limiter/luaLimiter";
 export async function rateLimiter(
   req: Request,
   res: Response,
@@ -23,10 +22,10 @@ export async function rateLimiter(
     });
   }
 
-  const result = await checkRateLimit(
-    client.id,
-    client.requestsPerMinute
-  );
+  const result = await checkSlidingWindow(
+  client.id,
+  client.requestsPerMinute
+);
 
   res.setHeader("X-RateLimit-Limit", client.requestsPerMinute);
   res.setHeader("X-RateLimit-Remaining", result.remaining);
