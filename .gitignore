@@ -1,5 +1,57 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Build output
+dist/
+build/
+
+# Coverage reports
+coverage/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Redis data (if running locally)
+dump.rdb
+appendonly.aof
+
+# Database files (local development)
+*.db
+*.sqlite
+*.sqlite3
+
+# Prisma generated files
+prisma/dev.db
+
+# Test artifacts
+test-results/
+
+# npm cache
+.npm/node_modules
 # Keep environment variables out of version control
 .env
 
 /src/generated/prisma
+
+.env
