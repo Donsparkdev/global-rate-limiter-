@@ -3,6 +3,7 @@ import redisClient from "./config/redis";
 import { rateLimiter } from "./middleware/rateLimiter";
 import metricsRouter from "./routes/metrics";
 import logger from "./logger";
+import { requestId } from "./middleware/requestId";
 
 const app = express();
 

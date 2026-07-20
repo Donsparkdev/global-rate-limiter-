@@ -32,12 +32,13 @@ export async function rateLimiter(
 
   // Log every request
   logger.info({
+  requestId: req.headers["x-request-id"],
   client: client.id,
   endpoint: req.originalUrl,
   method: req.method,
   remaining: result.remaining,
-  limiter: result.source
-   });
+  limiter: "sliding-window",
+});
 
   res.setHeader("X-RateLimit-Limit", client.requestsPerMinute);
   res.setHeader("X-RateLimit-Remaining", result.remaining);

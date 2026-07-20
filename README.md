@@ -1,151 +1,205 @@
-# Global Rate Limiter
+# Global Rate Limiter as a Service
 
-A distributed API rate limiter built with **TypeScript**, **Express.js**, **Redis**, and **Lua**.
+A high-performance distributed API rate limiter built with TypeScript, Express.js, Redis, and Lua.
+
+The service provides centralized rate limiting for multiple clients and API consumers while maintaining low latency and accurate limits across multiple application instances.
+
+---
 
 ## Features
 
 - Distributed rate limiting
-- Sliding Window algorithm using Redis Lua scripts
-- API Key authentication
-- Configurable rate limits
-- Express middleware
-- Health endpoint
+- Redis-backed shared state
+- Lua atomic sliding window algorithm
+- Multi-client configurable limits
+- API key authentication
+- Request ID tracing
+- Structured logging
+- Health monitoring
 - Metrics endpoint
-- Structured logging with Pino
-- Redis-backed state
-- Production-ready architecture
+- Docker support
+- Fail-safe Redis handling
 
-## Tech Stack
+---
 
+## Architecture
+Fail-safe Redis handling
+
+---
+
+## Architecture
+Client Request
+
+                   |
+                   v
+
+          Express API Gateway
+
+                   |
+                   v
+
+        Rate Limiter Middleware
+
+          /                  \
+
+         v                    v
+
+ API Key Validation       Redis Lua Script
+
+                                |
+
+                                v
+
+                          Redis Storage
+
+                                |
+
+                                v
+
+                     Usage Metrics + Logs
+---
+
+## Technology Stack
+
+- Node.js
 - TypeScript
 - Express.js
 - Redis
-- Lua
-- Pino
-- Node.js
+- Lua scripting
+- Pino Logger
+- Docker
+
+---
+
+## How It Works
+
+Each client receives a configured request limit.
+
+Example:
+Client A 100 requests/minute
+Client B 5000 requests/minute
+
+The Lua script executes atomically inside Redis ensuring accurate counting even when multiple service instances are running.
+
+---
 
 ## Project Structure
 
-```
-src/
-├── config/
-├── middleware/
-├── services/
-│   ├── limiter/
-│   └── clientService.ts
-├── lua/
-├── logger.ts
-├── index.ts
-```
+src ├── config │   └── redis.ts ├── middleware │   ├── rateLimiter.ts │   └── requestId.ts ├── services │   └── limiter │       └── luaLimiter.ts ├── lua │   └── slidingWindow.lua ├── logger.ts └── index.ts
 
-## Installation
+---
+
+# Installation
 
 ```bash
-git clone https://github.com/Donsparkdev/global-rate-limiter-.git
+git clone https://github.com/Donsparkdev/global-rate-limiter-
 
 cd global-rate-limiter
 
 npm install
-```
 
-## Environment Variables
+# Environment
 
-Create a `.env` file.
+Create .env
 
-```env
 PORT=3000
 REDIS_URL=redis://localhost:6379
 LOG_LEVEL=info
-```
 
-## Running
+# Running
 
-Start Redis
+Start Redis:
 
-```bash
 redis-server
-```
 
-Start the API
 
-```bash
+Start application:
+
 npm run dev
-```
 
-## API
+# Docker
 
-### Health
+Run:
 
-```
+docker compose up --build
+
+# API
+
+Health Check
+
 GET /health
-```
 
-### Metrics
+Example response:
 
-```
+{
+ "status":"OK",
+ "redis":"connected"
+}
+
+# Metrics
+
 GET /metrics
-```
 
-### Protected Endpoint
+Example
 
-```
+{
+ "activeClients":2,
+ "redis":true
+}
+
+# Protected API
+
 GET /api/test
-```
 
-Headers
+Header:
 
-```
 x-api-key: clientA
-```
 
-Response
+Response:
 
-```json
 {
-  "message": "Request accepted"
+ "message":"Request accepted"
 }
-```
 
-After exceeding the configured request limit
+When limit is exceeded:
 
-```json
+429 Too Many Requests
+
+# Logging
+
+Every approved request includes:
+Request ID
+Client ID
+Endpoint
+HTTP method
+Remaining quota
+
+Example:
+
+INFO:
 {
-  "message": "Rate limit exceeded"
+ requestId:"7d8c...",
+ client:"clientA",
+ endpoint:"/api/test",
+ remaining:4
 }
-```
 
-## Architecture
+# Fail Safe Strategy
 
-```
-Client
-   │
-   ▼
-Express Server
-   │
-   ▼
-Rate Limiter Middleware
-   │
-   ├─────────────┐
-   ▼             ▼
-API Key      Lua Script
-Validation   Sliding Window
-      │          │
-      └──────┬───┘
-             ▼
-           Redis
-             │
-             ▼
-     Metrics & Logging
-```
+If Redis becomes temporarily unavailable:
+The service detects connection failure.
+Requests are handled according to fallback policy.
+The API remains available.
 
-## Future Improvements
+# Future Improvements
 
-- PostgreSQL + Prisma
-- Dashboard
-- Swagger/OpenAPI
-- Prometheus metrics
-- GitHub Actions CI/CD
+PostgreSQL + Prisma client management
+Admin dashboard
+Usage analytics
+Prometheus metrics
+Automated load testing
+Kubernetes deployment
 
-## Author
+# Author
 
-**Donsparkdev**
+Donsparkdev
