@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { getClient } from "../services/clientService";
 import { checkSlidingWindow } from "../services/limiter/luaLimiter";
 import logger from "../logger";
+import { logRequest } from "../services/analyticsService";
 
 export async function rateLimiter(
   req: Request,
@@ -31,11 +32,12 @@ export async function rateLimiter(
 
   // Log every request
   logger.info({
-    client: client.id,
-    endpoint: req.originalUrl,
-    method: req.method,
-    remaining: result.remaining,
-  });
+  client: client.id,
+  endpoint: req.originalUrl,
+  method: req.method,
+  remaining: result.remaining,
+  limiter: result.source
+   });
 
   res.setHeader("X-RateLimit-Limit", client.requestsPerMinute);
   res.setHeader("X-RateLimit-Remaining", result.remaining);
@@ -51,7 +53,14 @@ export async function rateLimiter(
     return res.status(429).json({
       message: "Rate limit exceeded",
     });
+     
   }
+await logRequest(
+  client.id,
+  req.originalUrl,
+  req.method
+  );
 
   next();
+
 }

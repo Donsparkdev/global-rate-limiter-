@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import path from "path";
 import redisClient from "../../config/redis";
+import logger from "../../logger";
 
 const luaScript = readFileSync(
   path.join(__dirname, "../../lua/slidingWindow.lua"),
@@ -12,21 +13,47 @@ export async function checkSlidingWindow(
   limit: number,
   windowMs = 60000
 ) {
-  const now = Date.now();
+  try {
+    // Redis health check
+    if (!redisClient.isReady) {
+      throw new Error("Redis unavailable");
+    }
 
-  const result = await redisClient.eval(luaScript, {
-    keys: [`rate:${clientId}`],
-    arguments: [
-      now.toString(),
-      windowMs.toString(),
-      limit.toString(),
-    ],
-  });
+    const now = Date.now();
 
-  const [allowed, remaining] = result as number[];
+    const result = await redisClient.eval(luaScript, {
+      keys: [`rate:${clientId}`],
+      arguments: [
+        now.toString(),
+        windowMs.toString(),
+        limit.toString(),
+      ],
+    });
 
-  return {
-    allowed: allowed === 1,
-    remaining,
-  };
+    const [allowed, remaining] = result as number[];
+
+    return {
+      allowed: allowed === 1,
+      remaining,
+      source: "redis",
+    };
+
+  } catch (error) {
+
+    logger.warn({
+      message: "Rate limiter fallback activated",
+      client: clientId,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unknown error",
+    });
+
+    // Fail-open strategy
+    return {
+      allowed: true,
+      remaining: limit,
+      source: "fallback",
+    };
+  }
 }

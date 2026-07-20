@@ -36,18 +36,46 @@ app.get(
 );
 
 
-// Health check
+// Health check 
 app.get("/health", (_req, res) => {
+  const memory = process.memoryUsage();
 
   res.json({
     status: "OK",
-    redis: redisClient.isReady ? "connected" : "disconnected",
     service: "Global Rate Limiter",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    redis: redisClient.isReady ? "connected" : "disconnected",
+    memory: {
+      rss: memory.rss,
+      heapUsed: memory.heapUsed,
+      heapTotal: memory.heapTotal,
+    },
   });
-
 });
 
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  logger.info(`🚀 Server running on port ${PORT}`);
 });
+
+async function shutdown() {
+  logger.info("Shutting down server...");
+
+  server.close(async () => {
+    try {
+      if (redisClient.isOpen) {
+        await redisClient.quit();
+      }
+
+      logger.info("Redis disconnected");
+      process.exit(0);
+    } catch (error) {
+      logger.error(error);
+      process.exit(1);
+    }
+  });
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
