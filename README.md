@@ -60,7 +60,7 @@ Client Request
 ---
 
 ## Technology Stack
-
+-
 - Node.js
 - TypeScript
 - Express.js
@@ -68,7 +68,7 @@ Client Request
 - Lua scripting
 - Pino Logger
 - Docker
-
+-
 ---
 
 ## How It Works
@@ -77,19 +77,19 @@ Each client receives a configured request limit.
 
 Example:
 Client A 100 requests/minute
-Client B 5000 requests/minute
+C---------lient B 5000 requests/minute
 
 The Lua script executes atomically inside Redis ensuring accurate counting even when multiple service instances are running.
 
 ---
 
 ## Project Structure
-
+-
 src ├── config │   └── redis.ts ├── middleware │   ├── rateLimiter.ts │   └── requestId.ts ├── services │   └── limiter │       └── luaLimiter.ts ├── lua │   └── slidingWindow.lua ├── logger.ts └── index.ts
 
 ---
 
-# Installation
+## Installation
 
 ```bash
 git clone https://github.com/Donsparkdev/global-rate-limiter-
@@ -98,7 +98,7 @@ cd global-rate-limiter
 
 npm install
 
-# Environment
+## Environment
 
 Create .env
 
@@ -106,7 +106,7 @@ PORT=3000
 REDIS_URL=redis://localhost:6379
 LOG_LEVEL=info
 
-# Running
+## Running
 
 Start Redis:
 
@@ -117,13 +117,13 @@ Start application:
 
 npm run dev
 
-# Docker
+## Docker
 
 Run:
 
 docker compose up --build
 
-# API
+## API
 
 Health Check
 
@@ -136,7 +136,7 @@ Example response:
  "redis":"connected"
 }
 
-# Metrics
+## Metrics
 
 GET /metrics
 
@@ -147,7 +147,7 @@ Example
  "redis":true
 }
 
-# Protected API
+## Protected API
 
 GET /api/test
 
@@ -165,7 +165,7 @@ When limit is exceeded:
 
 429 Too Many Requests
 
-# Logging
+## Logging
 
 Every approved request includes:
 Request ID
@@ -184,14 +184,14 @@ INFO:
  remaining:4
 }
 
-# Fail Safe Strategy
+## Fail Safe Strategy
 
 If Redis becomes temporarily unavailable:
 The service detects connection failure.
 Requests are handled according to fallback policy.
 The API remains available.
 
-# Future Improvements
+## Future Improvements
 
 PostgreSQL + Prisma client management
 Admin dashboard
@@ -200,6 +200,7 @@ Prometheus metrics
 Automated load testing
 Kubernetes deployment
 
-# Author
+## Author
 
 Donsparkdev
+
