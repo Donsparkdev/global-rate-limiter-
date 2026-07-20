@@ -27,7 +27,7 @@ Fail-safe Redis handling
 
 ---
 
-## Architecture
+ Architecture
 Client Request
 
                    |
@@ -57,9 +57,12 @@ Client Request
                                 v
 
                      Usage Metrics + Logs
+
+
+![Global Rate Limiter Architecture](docs/architecture.png)
 ---
 
-## Technology Stack
+ Technology Stack
 -
 - Node.js
 - TypeScript

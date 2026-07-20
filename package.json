@@ -46,13 +46,16 @@
     "distributed",
     "api",
     "middleware"
-  ]
+   ],
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Donsparkdev/global-rate-limiter-.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/Donsparkdev/global-rate-limiter-/issues"
+  },
+
+  "homepage": "https://github.com/Donsparkdev/global-rate-limiter-#readme"
 }
-"repository": {
-  "type": "git",
-  "url": "https://github.com/Donsparkdev/global-rate-limiter-.git"
-},
-"bugs": {
-  "url": "https://github.com/Donsparkdev/global-rate-limiter-/issues"
-},
-"homepage": "https://github.com/Donsparkdev/global-rate-limiter-#readme"
