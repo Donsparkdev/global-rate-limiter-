@@ -25,27 +25,27 @@ export async function rateLimiter(
     });
   }
 
+  try {
   const result = await checkSlidingWindow(
     client.id,
     client.requestsPerMinute
   );
 
-  // Log every request
   logger.info({
-  requestId: req.headers["x-request-id"],
-  client: client.id,
-  endpoint: req.originalUrl,
-  method: req.method,
-  remaining: result.remaining,
-  limiter: "sliding-window",
-});
+    requestId: req.headers["x-request-id"],
+    client: client.id,
+    endpoint: req.originalUrl,
+    method: req.method,
+    remaining: result.remaining,
+    limiter: "sliding-window",
+  });
 
   res.setHeader("X-RateLimit-Limit", client.requestsPerMinute);
   res.setHeader("X-RateLimit-Remaining", result.remaining);
 
   if (!result.allowed) {
-    // Log only blocked requests
     logger.warn({
+      requestId: req.headers["x-request-id"],
       client: client.id,
       endpoint: req.originalUrl,
       message: "Rate limit exceeded",
@@ -54,14 +54,17 @@ export async function rateLimiter(
     return res.status(429).json({
       message: "Rate limit exceeded",
     });
-     
   }
-await logRequest(
-  client.id,
-  req.originalUrl,
-  req.method
-  );
 
   next();
 
+} catch (error) {
+  logger.error({
+    requestId: req.headers["x-request-id"],
+    error,
+    message: "Redis unavailable. Using fail-safe strategy.",
+  });
+
+  // Fail-safe: allow the request if Redis is temporarily unavailable
+  next();
 }
